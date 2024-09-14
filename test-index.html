@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geolocation Info</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #4a90e2;
+        }
+        .info {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+        .info div {
+            background: #e1e1e1;
+            padding: 15px;
+            border-radius: 5px;
+            flex: 1;
+            min-width: 200px;
+        }
+        .info img {
+            width: 50px;
+            height: 30px;
+            vertical-align: middle;
+        }
+        .info h2 {
+            margin: 0 0 10px;
+            color: #4a90e2;
+        }
+        .info p {
+            margin: 5px 0;
+        }
+        .flag-emoji {
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Geolocation Information</h1>
+        <div class="info" id="geo-info">
+            <!-- Information will be injected here -->
+        </div>
+    </div>
+
+    <script>
+        const API_KEY = '2bdcf74ad6153c046e4af6e924ff3397';
+
+        function unicodeToEmoji(unicode) {
+            return unicode.split('U+').slice(1).map(code => String.fromCodePoint(parseInt(code, 16))).join('');
+        }
+
+        async function fetchGeoData() {
+            try {
+                const response = await fetch(`https://api.ipstack.com/check?access_key=${API_KEY}`);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+
+                // Convert flag emoji Unicode to actual emoji
+                const flagEmoji = data.country_flag_emoji_unicode ? unicodeToEmoji(data.country_flag_emoji_unicode) : 'N/A';
+
+                // Create HTML structure for displaying the information
+                const infoHTML = `
+                    <div>
+                        <h2>IP Address</h2>
+                        <p>${data.ip || 'N/A'}</p>
+                    </div>
+                    <div>
+                        <h2>Continent</h2>
+                        <p>${data.continent_name || 'N/A'} (${data.continent_code || 'N/A'})</p>
+                    </div>
+                    <div>
+                        <h2>Country</h2>
+                        <p>${data.country_name || 'N/A'} (${data.country_code || 'N/A'})</p>
+                        <span class="flag-emoji">${flagEmoji}</span>
+                    </div>
+                    <div>
+                        <h2>Region</h2>
+                        <p>${data.region_name || 'N/A'} (${data.region_code || 'N/A'})</p>
+                    </div>
+                    <div>
+                        <h2>City</h2>
+                        <p>${data.city || 'N/A'}</p>
+                    </div>
+                    <div>
+                        <h2>Coordinates</h2>
+                        <p>Latitude: ${data.latitude || 'N/A'}</p>
+                        <p>Longitude: ${data.longitude || 'N/A'}</p>
+                    </div>
+                    <div>
+                        <h2>Timezone</h2>
+                        <p>${data.time_zone?.id || 'N/A'}</p>
+                        <p>Current Time: ${data.time_zone?.current_time || 'N/A'}</p>
+                    </div>
+                    <div>
+                        <h2>Currency</h2>
+                        <p>${data.currency?.name || 'N/A'} (${data.currency?.code || 'N/A'})</p>
+                    </div>
+                    <div>
+                        <h2>ISP</h2>
+                        <p>${data.connection?.isp || 'N/A'}</p>
+                    </div>
+                `;
+
+                document.getElementById('geo-info').innerHTML = infoHTML;
+            } catch (error) {
+                console.error('Error fetching geolocation data:', error);
+                document.getElementById('geo-info').innerHTML = '<p>Sorry, there was an error fetching the geolocation data.</p>';
+            }
+        }
+
+        window.onload = fetchGeoData;
+    </script>
+</body>
+</html>
