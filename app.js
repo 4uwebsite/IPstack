@@ -46,6 +46,14 @@ function populateLocation(locData){
                 <span class="item-label">DMA</span>
                 <span class="item-data">${locData.dma}</span>
             </li>
+            <li class="data-item">
+                <span class="item-label">Latitude</span>
+                <span class="item-data">${locData.latitude}</span>
+            </li>
+            <li class="data-item">
+                <span class="item-label">Calling Code</span>
+                <span class="item-data">${locData.calling_code}</span>
+            </li>
         </ul>
     `
     document.getElementById("card-body").innerHTML = html
